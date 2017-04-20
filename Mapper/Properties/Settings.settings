@@ -1,0 +1,24 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Mapper.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="OneDrivePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="OneDriveLetter" Type="System.Char" Scope="User">
+      <Value Profile="(Default)">x</Value>
+    </Setting>
+    <Setting Name="OneDriveBaseUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://onsight-my.sharepoint.com</Value>
+    </Setting>
+    <Setting Name="SendAnalyticsToDeveloper" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="OneDriveName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">OneDrive drive</Value>
+    </Setting>
+    <Setting Name="ApplicationInsightKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)">d1d1c83a-eab5-4822-9b41-4d337b3b649d</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

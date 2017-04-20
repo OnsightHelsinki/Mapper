@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <UI>
+      <Dialog Id="ParametersDlg" Width="370" Height="270" Title="Parameters">
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="Install">
+          <Publish Event="EndDialog" Value="Return">1</Publish>
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="Cancel">
+          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+        </Control>
+        <Control Id="DriveLetterLabel" Type="Text" Height="15" Width="256" 
+                 X="20" 
+                 Y="20"
+                 
+                 Text="Drive letter" />
+        <Control Id="DriveLetter" Type="Edit" Height="15" Width="92" 
+                 X="20"
+                 Y="35"
+                 Property="DRIVE_LETTER" />
+        <Control Id="BaseUrlLabel" Type="Text" Height="15" Width="256" 
+                 X="20" 
+                 Y="50" 
+                 Text="One Drive base URL" />
+        <Control Id="BaseUrl" Type="Edit" Height="15" Width="92" 
+                 X="20" 
+                 Y="65" 
+                 Property="BASE_URL" />
+        <Control Id="DriveNameLabel" Type="Text" Height="15" Width="256" 
+                 X="20" 
+                 Y="80" 
+                 Text="Name of the drive after mapping" />
+        <Control Id="DriveName" Type="Edit" Height="15" Width="92" 
+                 X="20" 
+                 Y="95" 
+                 Property="DRIVE_NAME" />
+      </Dialog>
+    </UI>
+  </Fragment>
+</Wix>
