@@ -6,8 +6,4 @@
         mc:Ignorable="d"
         
         Title="OneDrive Mapper" Height="1" Width="1" ShowInTaskbar="False" ResizeMode="NoResize">
-    <Grid>
-        <WebBrowser x:Name="browser1" HorizontalAlignment="Center" Margin="5" VerticalAlignment="Center"  />
-
-    </Grid>
 </Window>

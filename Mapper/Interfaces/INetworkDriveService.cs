@@ -8,6 +8,7 @@
     public enum MappingNetworkDriveResult
     {
         Success,
-        FailedBecauseOfLogin
+        FailedBecauseOfLogin,
+        WrongParameters
     }
 }

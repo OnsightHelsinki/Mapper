@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:ui="http://schemas.microsoft.com/wix/UIExtension" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-  <Product Id="*" Name="Mapper" Language="1033" Version="1.6.0.0" Manufacturer="Onsight Helsinki oy" UpgradeCode="ce481f54-4813-4cdb-ad7b-ce11efe47176">
+  <Product Id="*" Name="Mapper" Language="1033" Version="1.7.0.0" Manufacturer="Onsight Helsinki oy" UpgradeCode="ce481f54-4813-4cdb-ad7b-ce11efe47176">
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
     <MediaTemplate EmbedCab="yes" />
@@ -34,6 +34,7 @@
     <Property Id="DRIVE_LETTER" Value="Z" />
     <Property Id="DRIVE_NAME" Value="OneDrive" />
     <Property Id="SEND_ANALYTICS" Value="False" />
+    <Property Id="APPLICATION_INSIGHT_KEY" Value="d1d1c83a-eab5-4822-9b41-4d337b3b649d" />
   </Product>
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
@@ -63,26 +64,19 @@
               Action='setValue'
               ElementPath="/configuration/userSettings/Mapper.Properties.Settings/setting[\[]@name='SendAnalyticsToDeveloper'[\]]/value"
               File='[INSTALLFOLDER]Mapper.exe.config' Value='[SEND_ANALYTICS]' />
+        <util:XmlFile Id='UpdateApplicationInsightKey'
+              Action='setValue'
+              ElementPath="/configuration/userSettings/Mapper.Properties.Settings/setting[\[]@name='ApplicationInsightKey'[\]]/value"
+              File='[INSTALLFOLDER]Mapper.exe.config' Value='[APPLICATION_INSIGHT_KEY]' />
+        
       </Component>
       <Component Win64='yes' Id="RegistryKeyEntry">
         <RegistryKey Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap" ForceCreateOnInstall="yes">
           <RegistryKey Key="Domains" ForceCreateOnInstall="yes">
             <RegistryKey Key="[BASE_URL]" ForceCreateOnInstall="yes">
-              <RegistryValue Type="integer" Name="https" Value="1" />
+              <RegistryValue Type="integer" Name="https" Value="2" />
               <RegistryKey Key="www" ForceCreateOnInstall="yes">
-                <RegistryValue Type="integer" Name="https" Value="1" />
-              </RegistryKey>
-            </RegistryKey>
-            <RegistryKey Key="office.com" ForceCreateOnInstall="yes">
-              <RegistryValue Type="integer" Name="https" Value="1"/>
-              <RegistryKey Key="www" ForceCreateOnInstall="yes">
-                <RegistryValue Type="integer" Name="https" Value="1"/>
-              </RegistryKey>
-            </RegistryKey>
-            <RegistryKey Key="login.microsoftonline.com" ForceCreateOnInstall="yes">
-              <RegistryValue Type="integer" Name="https" Value="1"/>
-              <RegistryKey Key="www" ForceCreateOnInstall="yes">
-                <RegistryValue Type="integer" Name="https" Value="1" />
+                <RegistryValue Type="integer" Name="https" Value="2" />
               </RegistryKey>
             </RegistryKey>
           </RegistryKey>

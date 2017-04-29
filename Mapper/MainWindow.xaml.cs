@@ -12,6 +12,7 @@ namespace Mapper
         private readonly ISettingsService _settingsService;
         private readonly ILoggingService _loggingService;
         private readonly ShellService _shellService;
+        private readonly BrowserService _browserService;
         public MainWindow()
         {
             InitializeComponent();
@@ -19,32 +20,27 @@ namespace Mapper
             _settingsService = new SettingsService();
             _loggingService.Initialize(_settingsService.SendAnalyticsToDeveloper(), _settingsService.ApplicationInsightKey());
             _networkDriveService = new NetworkDriveService(_loggingService);
-            var browserService = new BrowserService(browser1);
+            _browserService = new BrowserService();
             _shellService = new ShellService();
-            browserService.OneDrivePathFiguredOut += _browserService_OneDrivePathFiguredOut;
-            browserService.LoginInputRequired += _browserService_LoginInputRequired;
+            _browserService.OneDrivePathFiguredOut += _browserService_OneDrivePathFiguredOut;
             Loaded += MainWindow_Loaded;
             Top = -2000;
         }
 
-        private void _browserService_LoginInputRequired(object sender, EventArgs e)
-        {
-            Top = 200;
-            Height = 570;
-            Width = 500;
-        }
-
         private void _browserService_OneDrivePathFiguredOut(object sender, string e)
         {
-            _settingsService.SaveSettings("OneDrivePath", e);
-            MapNetworkDrive();
+            Application.Current.Dispatcher.Invoke( () => {
+                _settingsService.SaveSettings("OneDrivePath", e);
+                MapNetworkDrive();
+            });
+
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(_settingsService.OneDrivePath()))
             {
-                browser1.Navigate(_settingsService.OneDriveBaseUrl());
+                _browserService.Navigate(_settingsService.OneDriveBaseUrl());
             }
             else
             {
@@ -68,11 +64,16 @@ namespace Mapper
                     break;
                 case MappingNetworkDriveResult.FailedBecauseOfLogin:
                     _loggingService.Log("Failed to add onedrive as mapped drive, url " + _settingsService.OneDriveBaseUrl());
-                    browser1.Navigate(_settingsService.OneDriveBaseUrl());
+                    _browserService.Navigate(_settingsService.OneDriveBaseUrl());
+                    break;
+                case MappingNetworkDriveResult.WrongParameters:
+                    _loggingService.Log("We failed with wrong parameters");
+                    Close();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+            _browserService.Cleanup();
         }
     }
 }
