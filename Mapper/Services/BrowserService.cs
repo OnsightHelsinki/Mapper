@@ -18,7 +18,7 @@ namespace Mapper.Services
             ie.BeforeNavigate2 += Ie_BeforeNavigate2;
             ie.NavigateComplete2 += Ie_NavigateComplete2;
 
-            ie.Visible = true;
+            //ie.Visible = true;
         }
 
         public void Cleanup()
@@ -111,7 +111,7 @@ namespace Mapper.Services
 
         private void ssoTimerTick(object sender, EventArgs e)
         {
-            ie.Visible = true;
+            //ie.Visible = true;
         }
     }
 }

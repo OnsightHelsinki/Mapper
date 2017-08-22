@@ -24,8 +24,14 @@ namespace Mapper.Services
                 .Replace("/","#")
                 .Replace("#personal", "@SSL#DavWWWRoot#personal");
 
+            // Win10 
             RegistryKey currentUserKey = Registry.CurrentUser;
             var davKey = currentUserKey.GetOrCreateSubKey(ShellKeyLocation, dav, true);
+            davKey.SetValue("_LabelFromReg", name, RegistryValueKind.String);
+
+            // Win 8.1
+            dav = dav.Replace("DavWWWRoot#", string.Empty);
+            davKey = currentUserKey.GetOrCreateSubKey(ShellKeyLocation, dav, true);
             davKey.SetValue("_LabelFromReg", name, RegistryValueKind.String);
         }
 
