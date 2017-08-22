@@ -34,6 +34,10 @@
                  X="20" 
                  Y="95" 
                  Property="DRIVE_NAME" />
+        <Control Id="ADFSDomain" Type="Edit" Height="15" Width="92"
+                 X="20"
+                 Y="110"
+                 Property="ADFS_DOMAIN" />
       </Dialog>
     </UI>
   </Fragment>

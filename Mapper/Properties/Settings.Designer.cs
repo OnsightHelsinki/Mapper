@@ -12,7 +12,7 @@ namespace Mapper.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.1.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -49,18 +49,6 @@ namespace Mapper.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://onsight-my.sharepoint.com")]
-        public string OneDriveBaseUrl {
-            get {
-                return ((string)(this["OneDriveBaseUrl"]));
-            }
-            set {
-                this["OneDriveBaseUrl"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool SendAnalyticsToDeveloper {
             get {
@@ -73,7 +61,31 @@ namespace Mapper.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("OneDrive drive")]
+        [global::System.Configuration.DefaultSettingValueAttribute("d1d1c83a-eab5-4822-9b41-4d337b3b649d")]
+        public string ApplicationInsightKey {
+            get {
+                return ((string)(this["ApplicationInsightKey"]));
+            }
+            set {
+                this["ApplicationInsightKey"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://onsight-my.sharepoint.com")]
+        public string OneDriveBaseUrl {
+            get {
+                return ((string)(this["OneDriveBaseUrl"]));
+            }
+            set {
+                this["OneDriveBaseUrl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("OneDrive")]
         public string OneDriveName {
             get {
                 return ((string)(this["OneDriveName"]));
@@ -85,13 +97,13 @@ namespace Mapper.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("d1d1c83a-eab5-4822-9b41-4d337b3b649d")]
-        public string ApplicationInsightKey {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string OneDriveADFSBaseUrl {
             get {
-                return ((string)(this["ApplicationInsightKey"]));
+                return ((string)(this["OneDriveADFSBaseUrl"]));
             }
             set {
-                this["ApplicationInsightKey"] = value;
+                this["OneDriveADFSBaseUrl"] = value;
             }
         }
     }

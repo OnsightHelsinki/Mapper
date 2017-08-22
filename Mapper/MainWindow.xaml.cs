@@ -3,6 +3,7 @@ using System.Windows;
 using Mapper.Extensions;
 using Mapper.Interfaces;
 using Mapper.Services;
+using System.Net;
 
 namespace Mapper
 {
@@ -12,6 +13,7 @@ namespace Mapper
         private readonly ISettingsService _settingsService;
         private readonly ILoggingService _loggingService;
         private readonly ShellService _shellService;
+        private readonly BrowserService _browserService;
         public MainWindow()
         {
             InitializeComponent();
@@ -19,10 +21,11 @@ namespace Mapper
             _settingsService = new SettingsService();
             _loggingService.Initialize(_settingsService.SendAnalyticsToDeveloper(), _settingsService.ApplicationInsightKey());
             _networkDriveService = new NetworkDriveService(_loggingService);
-            var browserService = new BrowserService(browser1);
             _shellService = new ShellService();
-            browserService.OneDrivePathFiguredOut += _browserService_OneDrivePathFiguredOut;
-            browserService.LoginInputRequired += _browserService_LoginInputRequired;
+            _shellService.DisableInternetZoneProtectedMode();
+            _shellService.VerifyAndAddPathAsTrusted();
+            _browserService = new BrowserService();
+            _browserService.OneDrivePathFiguredOut += _browserService_OneDrivePathFiguredOut;
             Loaded += MainWindow_Loaded;
             Top = -2000;
         }
@@ -44,7 +47,14 @@ namespace Mapper
         {
             if (string.IsNullOrWhiteSpace(_settingsService.OneDrivePath()))
             {
-                browser1.Navigate(_settingsService.OneDriveBaseUrl());
+                if (string.IsNullOrWhiteSpace(_settingsService.OneDriveADFSBaseUrl()))
+                    _browserService.Navigate(_settingsService.OneDriveBaseUrl());
+                else
+                {
+                    var od4b_smarturl_template = "https://login.microsoftonline.com/login.srf?wa=wsignin1%2E0&rver=6%2E1%2E6206%2E0&wreply={0}%2F&whr={1}";
+                    var od4b_smarturl = string.Format(od4b_smarturl_template, WebUtility.UrlEncode(_settingsService.OneDriveBaseUrl()), WebUtility.UrlEncode(_settingsService.OneDriveADFSBaseUrl()));
+                    _browserService.Navigate(od4b_smarturl);
+                }
             }
             else
             {
@@ -54,8 +64,6 @@ namespace Mapper
 
         private void MapNetworkDrive()
         {
-            _shellService.VerifyAndAddPathAsTrusted(_settingsService.OneDrivePath());
-
             var result = _networkDriveService.MapNetworkDrive(
                 _settingsService.OneDriveLetter(),
                 _settingsService.OneDrivePath(),
@@ -70,11 +78,16 @@ namespace Mapper
                     break;
                 case MappingNetworkDriveResult.FailedBecauseOfLogin:
                     _loggingService.Log("Failed to add onedrive as mapped drive, url " + _settingsService.OneDriveBaseUrl());
-                    browser1.Navigate(_settingsService.OneDriveBaseUrl());
+                    _browserService.Navigate(_settingsService.OneDriveBaseUrl());
+                    break;
+                case MappingNetworkDriveResult.WrongParameters:
+                    _loggingService.Log("We failed with wrong parameters");
+                    Close();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+            _browserService.Cleanup();
         }
     }
 }

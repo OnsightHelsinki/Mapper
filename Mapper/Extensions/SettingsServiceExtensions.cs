@@ -19,6 +19,11 @@ namespace Mapper.Extensions
             return service.GetSetting<string>("OneDriveBaseUrl");
         }
 
+        public static string OneDriveADFSBaseUrl(this ISettingsService service)
+        {
+            return service.GetSetting<string>("OneDriveADFSBaseUrl");
+        }
+
         public static bool SendAnalyticsToDeveloper(this ISettingsService service)
         {
             return service.GetSetting<bool>("SendAnalyticsToDeveloper");

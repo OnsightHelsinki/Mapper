@@ -1,63 +1,56 @@
 ﻿using System;
-using System.Reflection;
 using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Navigation;
 using System.Windows.Threading;
+using SHDocVw;
 
 namespace Mapper.Services
 {
     public class BrowserService
     {
-        private readonly WebBrowser _browser;
         public event EventHandler<string> OneDrivePathFiguredOut;
-        public event EventHandler LoginInputRequired;
-        private readonly DispatcherTimer _timer;
-        public BrowserService(WebBrowser browser)
+        private readonly DispatcherTimer _ssoTimer;
+        private readonly InternetExplorer ie;
+        public BrowserService()
         {
-            _browser = browser;
-            HideScriptErrors(_browser, true);
-            _browser.Navigated += Browser_Navigated;
-            _browser.Navigating += Browser_Navigating;
-            _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(6) };
-            _timer.Tick += _timer_Tick;
+            _ssoTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(6) };
+            _ssoTimer.Tick += ssoTimerTick;
+            ie = (SHDocVw.InternetExplorer)Activator.CreateInstance(Type.GetTypeFromProgID("InternetExplorer.Application"));
+            ie.BeforeNavigate2 += Ie_BeforeNavigate2;
+            ie.NavigateComplete2 += Ie_NavigateComplete2;
+
+            ie.Visible = true;
         }
 
-        private void Browser_Navigating(object sender, NavigatingCancelEventArgs e)
+        public void Cleanup()
         {
-            var navigatingToUrl = e.Uri.ToString();
-            if (!navigatingToUrl.Contains("login.microsoftonline.com")) return;
-            if (!navigatingToUrl.Contains("/oauth2/authorize")) return;
-            if (navigatingToUrl.Contains("msafed=0")) return;
-            //Don't offer login with Microsoft Account
-            var url = navigatingToUrl.Replace("?", "?msafed=0&");
-            _browser.Navigate(url);
-        }
-
-        private void _timer_Tick(object sender, EventArgs e)
-        {
-            LoginInputRequired?.Invoke(this, EventArgs.Empty);
-        }
-
-        //Make sure we do not show user any annoying script error popups
-        public void HideScriptErrors(WebBrowser wb, bool hide)
-        {
-            var fiComWebBrowser = typeof(WebBrowser).GetField("_axIWebBrowser2", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (fiComWebBrowser == null) return;
-            var objComWebBrowser = fiComWebBrowser.GetValue(wb);
-            if (objComWebBrowser == null)
+            try
             {
-                wb.Loaded += (o, s) => HideScriptErrors(wb, hide); //In case we are too early
+                ie.Quit();
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        public void Navigate(string url)
+        {
+            ie.Navigate(url);
+        }
+
+        private void Ie_NavigateComplete2(object pDisp, ref object URL)
+        {
+            CheckCurrentUrl(URL as string);
+        }
+
+        public void CheckCurrentUrl(string URL)
+        {
+            if (URL == null)
+            {
                 return;
             }
-            objComWebBrowser.GetType().InvokeMember("Silent", BindingFlags.SetProperty, null, objComWebBrowser, new object[] { hide });
-        }
 
-        private async void Browser_Navigated(object sender, NavigationEventArgs e)
-        {
-            //Wait 500 ms to make sure page is mostly loaded
-            await Task.Delay(500);
-            dynamic doc = _browser.Document;
+            Task.Delay(500);
+            dynamic doc = ie.Document;
             dynamic htmlText;
             try
             {
@@ -80,27 +73,45 @@ namespace Mapper.Services
 
 
             string value = Convert.ToString(htmlText);
-            var indexOfLink = value.IndexOf("MySite.aspx?MySiteRedirect=AllDocuments", StringComparison.Ordinal);
+            var indexOfLink = URL.IndexOf("MySite.aspx?MySiteRedirect=AllDocuments", StringComparison.Ordinal);
             if (indexOfLink > 0)
             {
                 var index = value.LastIndexOf("\"", indexOfLink, StringComparison.Ordinal) + 1;
                 var tempUrl = value.Substring(index, indexOfLink - index) + "MySite.aspx?MySiteRedirect=AllDocuments";
-                _browser.Navigate(tempUrl);
-            }
-            var browserUrl = _browser.Source.AbsoluteUri;
-            if (value.Contains("/start.aspx#/Documents/Forms/All.aspx"))
-            {
-                _timer?.Stop();
-                browserUrl = browserUrl.Replace("_layouts/15/onedrive.aspx", "Documents");
-                //We got the URL and are good to go
-                OneDrivePathFiguredOut?.Invoke(this, browserUrl);
-            }
-            if (browserUrl.Contains("https://login.microsoftonline.com/"))
-            {
-                //Wait 6 seconds so that AD FS has enough time to do SSO
-                _timer?.Start();
+                Navigate(tempUrl);
+                return;
             }
 
+            if (URL.Contains("/start.aspx#/Documents/Forms/All.aspx") || URL.Contains("/_layouts/15/onedrive.aspx"))
+            {
+                _ssoTimer?.Stop();
+                var base_url = URL.Replace("_layouts/15/onedrive.aspx", "Documents");
+                //We got the URL and are good to go
+                OneDrivePathFiguredOut?.Invoke(this, base_url);
+                return;
+            }
+            if (URL.Contains("https://login.microsoftonline.com/"))
+            {
+                //Wait 6 seconds so that AD FS has enough time to do SSO
+                _ssoTimer?.Start();
+            }
+        }
+
+        private void Ie_BeforeNavigate2(object pDisp, ref object URL, ref object Flags, ref object TargetFrameName, ref object PostData, ref object Headers, ref bool Cancel)
+        {
+            var navigatingToUrl = URL as string;
+            if (navigatingToUrl == null) return;
+            if (!navigatingToUrl.Contains("login.microsoftonline.com")) return;
+            if (!navigatingToUrl.Contains("/oauth2/authorize")) return;
+            if (navigatingToUrl.Contains("msafed=0")) return;
+            //Don't offer login with Microsoft Account
+            var url = navigatingToUrl.Replace("?", "?msafed=0&");
+            Navigate(url);
+        }
+
+        private void ssoTimerTick(object sender, EventArgs e)
+        {
+            ie.Visible = true;
         }
     }
 }

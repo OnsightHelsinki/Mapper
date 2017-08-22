@@ -52,6 +52,10 @@
               Action='setValue'
               ElementPath="/configuration/userSettings/Mapper.Properties.Settings/setting[\[]@name='OneDriveLetter'[\]]/value"
               File='[INSTALLFOLDER]Mapper.exe.config' Value='[DRIVE_LETTER]' />
+        <util:XmlFile Id='ADFSDomain'
+              Action='setValue'
+              ElementPath="/configuration/userSettings/Mapper.Properties.Settings/setting[\[]@name='OneDriveADFSBaseUrl'[\]]/value"
+              File='[INSTALLFOLDER]Mapper.exe.config' Value='[ADFS_DOMAIN]' />
         <util:XmlFile Id='UpdateBaseUrl'
               Action='setValue'
               ElementPath="/configuration/userSettings/Mapper.Properties.Settings/setting[\[]@name='OneDriveBaseUrl'[\]]/value"

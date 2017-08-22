@@ -1,4 +1,6 @@
-﻿namespace Mapper.Interfaces
+﻿using System;
+
+namespace Mapper.Interfaces
 {
     public interface INetworkDriveService
     {

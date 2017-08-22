@@ -17,6 +17,7 @@ namespace Mapper.Services
         public MappingNetworkDriveResult MapNetworkDrive(char driveLetter, string path, int waitTimeMs)
         {
             driveLetter = FindAvailableDriveLetter(driveLetter);
+
             var cmd = "/c net use " + driveLetter + ": " + path + " /persistent:no";
             var p = ProcessHelpers.ExecuteCommandHidden(cmd);
 
@@ -32,6 +33,10 @@ namespace Mapper.Services
                     "System error 224 has occurred.\r\n\r\nAccess Denied. Before opening files in this location, you must first add the web site to your trusted sites list, browse to the web site, and select the option to login automatically.\r\n\r\n")
                 {
                     return MappingNetworkDriveResult.FailedBecauseOfLogin;
+                }
+                if (error.StartsWith("System error 67 has occurred."))
+                {
+                    return MappingNetworkDriveResult.WrongParameters;
                 }
                 if (output != "The command completed successfully.\r\n\r\n")
                 {
