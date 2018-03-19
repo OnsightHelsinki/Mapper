@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:ui="http://schemas.microsoft.com/wix/UIExtension" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+	<Product Id="*" Name="Sulava.MapperPS.Installer" Language="1033" Version="1.0.0.0" Manufacturer="Sulava" UpgradeCode="7e3c4c80-1092-4153-be07-eab91b6ff0c2">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+	  <MediaTemplate EmbedCab="yes" />
+
+		<Feature Id="ProductFeature" Title="Sulava.MapperPS.Installer" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+		</Feature>
+	  <UI Id="UserInterface">
+	    <Property Id="WixUI_Mode" Value="Custom" />
+
+	    <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+	    <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="9" Bold="yes" />
+	    <TextStyle Id="WixUI_Font_Title"  FaceName="Tahoma" Size="9" Bold="yes" />
+
+	    <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+
+	    <DialogRef Id="ProgressDlg" />
+	    <DialogRef Id="ErrorDlg" />
+	    <DialogRef Id="FilesInUse" />
+	    <DialogRef Id="FatalError" />
+	    <DialogRef Id="UserExit" />
+
+	    <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="ParametersDlg" Order="2"></Publish>
+	    <Publish Dialog="ParametersDlg" Event="EndDialog" Control="Next" Value="Return" Order="2"/>
+	    <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+
+	  </UI>
+	  <UIRef Id="WixUI_Common" />
+	  <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+	  <Property Id="DRIVE_LETTER" Value="Z" />
+    <Property Id="USER_LOOKUP_MODE" Value="1" />
+  
+	  <InstallExecuteSequence>
+	    <Custom Action='StartWebClientService' Before='InstallFiles'/>
+	    <!--<Custom Action='StartWebClientService' After='SetWebClientServiceAuto'/>-->
+	  </InstallExecuteSequence>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFiles64Folder">
+				<Directory Id="INSTALLFOLDER" Name="Sulava.Mapper" />
+			</Directory>
+		</Directory>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+			<!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
+			<Component Id="ProductComponent1" Win64='yes'> 
+				<!-- TODO: Insert files, registry keys, and other resources here. -->
+			   <File Source="$(var.Sulava.MapperPS.Mapper.ProjectDir)\Mapper.ps1" />
+			</Component>
+			<Component Id="ProductComponent2" Win64='yes'> 
+			   <File Source="$(var.Sulava.MapperPS.Mapper.ProjectDir)\Mapper.Settings.ps1" />
+			</Component>
+			<Component Id="ProductComponent3" Win64='yes'> 
+			   <File Source="$(var.Sulava.MapperPS.Mapper.ProjectDir)\tenant.xml" />
+         <util:XmlFile Id='UpdateDriveLetter'
+            Action='setValue'
+            ElementPath="/Settings/DriveLetter"
+            File='[INSTALLFOLDER]tenant.xml' Value='[DRIVE_LETTER]' />
+         <util:XmlFile Id='UpdateBaseUrl'
+            Action='setValue'
+            ElementPath="/Settings/Tenant"
+            File='[INSTALLFOLDER]tenant.xml' Value='[TENANT]' />
+			  <util:XmlFile Id='UpdateUserLookupMode'
+			      Action='setValue'
+			      ElementPath="/Settings/UserLookupMode"
+			      File='[INSTALLFOLDER]tenant.xml' Value='[USER_LOOKUP_MODE]' />
+      </Component>
+      <Component Win64='yes' Id="RegistryKeyEntry">
+        <RegistryKey Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap" ForceCreateOnInstall="yes">
+          <RegistryKey Key="Domains" ForceCreateOnInstall="yes">
+            <RegistryKey Key="https://[TENANT].sharepoint.com" ForceCreateOnInstall="yes">
+              <RegistryValue Type="integer" Name="https" Value="2" />
+              <RegistryKey Key="www" ForceCreateOnInstall="yes">
+                <RegistryValue Type="integer" Name="https" Value="2" />
+              </RegistryKey>
+            </RegistryKey>
+            <RegistryKey Key="https://[TENANT]-my.sharepoint.com" ForceCreateOnInstall="yes">
+              <RegistryValue Type="integer" Name="https" Value="2" />
+              <RegistryKey Key="www" ForceCreateOnInstall="yes">
+                <RegistryValue Type="integer" Name="https" Value="2" />
+              </RegistryKey>
+            </RegistryKey>
+          </RegistryKey>
+        </RegistryKey>
+        <RegistryKey Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Run" ForceCreateOnInstall="yes">
+           <RegistryValue Type="string" Name="Mapper Client" Value='Powershell.exe -WindowStyle Hidden -ExecutionPolicy ByPass -File "[INSTALLFOLDER]Mapper.ps1" -WindowStyle Hidden' KeyPath="yes"/>
+        </RegistryKey>
+        <RegistryKey Root="HKLM" Key="Software\Policies\Microsoft\Internet Explorer\Main" ForceCreateOnInstall="yes">
+          <RegistryValue Type="integer" Name="DisableFirstRunCustomize" Value="1" />
+        </RegistryKey>
+        <RegistryKey Root="HKLM" Key="System\CurrentControlSet\Services\Webclient" ForceCreateOnInstall="yes">
+          <RegistryValue Type="integer" Name="Start" Value="2" />
+        </RegistryKey>
+        <RegistryKey Root="HKLM" Key="System\CurrentControlSet\Services\Webclient\Parameters" ForceCreateOnInstall="yes">
+          <RegistryValue Type="integer" Name="FileSizeLimitInBytes" Value="3221225472" />
+          <RegistryValue Type="integer" Name="ServerNotFoundCacheLifetimeInSec" Value="10" />
+          <RegistryValue Type="integer" Name="SupportLocking" Value="0" />
+        </RegistryKey>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <!--<CustomAction Id='SetWebClientServiceAuto' Directory="INSTALLFOLDER" ExeCommand='SC CONFIG "WEBCLIENT" START=AUTO' Execute="immediate" Return="ignore" />-->
+    <CustomAction Id='StartWebClientService' Directory="INSTALLFOLDER" ExeCommand='NET START WEBCLIENT' Execute="deferred" Impersonate="no" Return="ignore" />
+  </Fragment>
+</Wix>
