@@ -30,7 +30,7 @@ msiexec /i Sulava.MapperPS.Installer.msi TENANT={tenant name} DRIVE_LETTER=X USE
 ## Depencies
 
 ### OneDriveMapper by Jos Lieben
-The Mapper installer wrapps the OneDriveMapper tool by Jos Lieben in an installer.
+The Mapper installer wraps the OneDriveMapper tool by Jos Lieben in an installer.
 - http://www.lieben.nu/liebensraum/onedrivemapper/
 
 ## Known problems and limitations
@@ -39,3 +39,8 @@ The Mapper installer wrapps the OneDriveMapper tool by Jos Lieben in an installe
 - RMUnify ‘kinda’ works in IE mode, native not supported
 - If you use redirection and restartExplorer true, make sure the OneDriveMapper runs when the user is fully logged in, restarting explorer during logon can cause hangs. Best practise: don’t enable it, the redirect will work the next logon for roaming profiles
 - The OneDriveMapper script does not work Powershell V2 or lower (comes with Windows 7), install V3 or higher
+
+## License
+- The installer is released under The MIT License (MIT) by Sulava Oy
+- The OneDriveMapper.ps1 is released under its own license by Jos Lieben (OGD)
+  - See https://gitlab.com/Lieben/OnedriveMapper_V3/blob/master/OneDriveMapper.ps1 for more details
