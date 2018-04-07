@@ -8,12 +8,14 @@ This tool maps OneDrive for Business as network drive using WebDAV. It does this
 3. Restart computer and you should see X: mapped as your One Drive for Business 
 
 ## Installing
-msiexec /i Sulava.MapperPS.Installer.msi TENANT={tenant name} DRIVE_LETTER=X USER_LOOKUP_MODE=1 /q
 
-### Installing parameters
-- DRIVE_LETTER: Which letter we try use for mapping. If letter is not available we try all the others.
-- TENANT: Name of the SharePoint Online tenant, i.e. <tenant>.sharepoint.com
-- USER_LOOKUP_MODE: Parameter for specifying how the user is fetched. Values are:
+### Installation command
+`msiexec /i Sulava.MapperPS.Installer.msi TENANT={tenant name} DRIVE_LETTER=X USER_LOOKUP_MODE=1 /q`
+
+### Parameters
+- *TENANT*: Name of the SharePoint Online tenant, i.e. <tenant>.sharepoint.com
+- *DRIVE_LETTER*: Which letter we try use for mapping. If letter is not available we try all the others.
+- *USER_LOOKUP_MODE*: Parameter for specifying how the user is fetched. Values are:
   -	1 = Active Directory UPN, 
   -	2 = Active Directory Email, 
   -	3 = Azure AD Joined Windows 10, 
@@ -29,27 +31,29 @@ msiexec /i Sulava.MapperPS.Installer.msi TENANT={tenant name} DRIVE_LETTER=X USE
 
 ## System changes
 
-### Registry keys added by the installer
+The installer will perform the configuration changes listed below.
+
+### Registry keys
 - Add relevant sites as trusted in Internet Explorer. See [this](https://support.microsoft.com/en-us/help/182569/internet-explorer-security-zones-registry-entries-for-advanced-users) page for more details.
- - HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains
-  - https://[TENANT].sharepoint.com
-   - Type="integer" Name="https" Value=2 (trusted internet zone)
-  - https://[TENANT]-my.sharepoint.com
-   - Type="integer" Name="https" Value="2"
+  - HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains
+    - Name="https://[TENANT].sharepoint.com"
+      - Type="integer" Name="https" Value=2 (trusted internet zone)
+    - NAme="https://[TENANT]-my.sharepoint.com"
+      - Type="integer" Name="https" Value="2"
 - Create a task run by Windows when starting
- - HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
-  - Type="string" Name="Mapper Client" Value='Powershell.exe -WindowStyle Hidden -ExecutionPolicy ByPass -File "[INSTALLFOLDER]Mapper.ps1"'
+  - HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
+    - Type="string" Name="Mapper Client" Value='Powershell.exe -WindowStyle Hidden -ExecutionPolicy ByPass -File "[INSTALLFOLDER]Mapper.ps1"'
 - Disable the First Run Customize Page in Internet Explorer
- - HKLM\Software\Policies\Microsoft\Internet Explorer\Main
-  - Type="integer" Name="DisableFirstRunCustomize" Value="1"
+  - HKLM\Software\Policies\Microsoft\Internet Explorer\Main
+    - Type="integer" Name="DisableFirstRunCustomize" Value="1"
 - Set the `webclient` service to automatically start
- - HKLM\System\CurrentControlSet\Services\Webclient
-  - Type="integer" Name="Start" Value="2"
+  - HKLM\System\CurrentControlSet\Services\Webclient
+    - Type="integer" Name="Start" Value="2"
 - Configure the `webclient` service
- - HKLM\System\CurrentControlSet\Services\Webclient\Parameters
-  - Type="integer" Name="FileSizeLimitInBytes" Value="3221225472"
-  - Type="integer" Name="ServerNotFoundCacheLifetimeInSec" Value="10"	
-  - Type="integer" Name="SupportLocking" Value="0"
+  - HKLM\System\CurrentControlSet\Services\Webclient\Parameters
+    - Type="integer" Name="FileSizeLimitInBytes" Value="3221225472"
+    - Type="integer" Name="ServerNotFoundCacheLifetimeInSec" Value="10"	
+    - Type="integer" Name="SupportLocking" Value="0"
  
 ### Custom actions run by the installer
  - Start the webclient service
