@@ -3,7 +3,7 @@
 This tool maps OneDrive for Business as network drive using WebDAV. It does this automatically using users credentials, if it fails then it will ask user input.
 
 ## Steps
-1. Figure out your One Drive for Business base URL it looks like something-my.sharepoint.com
+1. Figure out your SharePoint Online tenant name, if your tenant URL is https://sulava.sharepoint.com, then your tenant name is "sulava"
 2. Install the tool (Requires administrator rights because it sets login.microsoftonline.com, office.com and your company domain as trusted sites to IE) and sets the tool to auto start on login as well as starts neccessary services for using WebDav
 3. Restart computer and you should see X: mapped as your One Drive for Business 
 
@@ -12,7 +12,7 @@ msiexec /i Sulava.MapperPS.Installer.msi TENANT={tenant name} DRIVE_LETTER=X USE
 
 ### Installing parameters
 - DRIVE_LETTER: Which letter we try use for mapping. If letter is not available we try all the others.
-- DRIVE_NAME: How we name the share on explorer
+- TENANT: Name of the SharePoint Online tenant, i.e. <tenant>.sharepoint.com
 - USER_LOOKUP_MODE: Parameter for specifying how the user is fetched. Values are:
   -	1 = Active Directory UPN, 
   -	2 = Active Directory Email, 
@@ -27,18 +27,47 @@ msiexec /i Sulava.MapperPS.Installer.msi TENANT={tenant name} DRIVE_LETTER=X USE
 - Visual Studio 2015
 - [Wix Toolset 3.11.0.1528](http://wixtoolset.org/releases/v3-11-0-1528)
 
+## System changes
+
+### Registry keys added by the installer
+- Add relevant sites as trusted in Internet Explorer. See [this](https://support.microsoft.com/en-us/help/182569/internet-explorer-security-zones-registry-entries-for-advanced-users) page for more details.
+ - HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains
+  - https://[TENANT].sharepoint.com
+   - Type="integer" Name="https" Value=2 (trusted internet zone)
+  - https://[TENANT]-my.sharepoint.com
+   - Type="integer" Name="https" Value="2"
+- Create a task run by Windows when starting
+ - HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
+  - Type="string" Name="Mapper Client" Value='Powershell.exe -WindowStyle Hidden -ExecutionPolicy ByPass -File "[INSTALLFOLDER]Mapper.ps1"'
+- Disable the First Run Customize Page in Internet Explorer
+ - HKLM\Software\Policies\Microsoft\Internet Explorer\Main
+  - Type="integer" Name="DisableFirstRunCustomize" Value="1"
+- Set the `webclient` service to automatically start
+ - HKLM\System\CurrentControlSet\Services\Webclient
+  - Type="integer" Name="Start" Value="2"
+- Configure the `webclient` service
+ - HKLM\System\CurrentControlSet\Services\Webclient\Parameters
+  - Type="integer" Name="FileSizeLimitInBytes" Value="3221225472"
+  - Type="integer" Name="ServerNotFoundCacheLifetimeInSec" Value="10"	
+  - Type="integer" Name="SupportLocking" Value="0"
+ 
+### Custom actions run by the installer
+ - Start the webclient service
+  - This require the installer to be started using an administrator account, or an account capable of starting services
+  - Command: `NET START WEBCLIENT`
+ 
 ## Depencies
 
 ### OneDriveMapper by Jos Lieben
 The Mapper installer wraps the OneDriveMapper tool by Jos Lieben in an installer.
 - http://www.lieben.nu/liebensraum/onedrivemapper/
+- Current bundled version 3.14
 
 ## Known problems and limitations
-- MFA support is still pending
+- MFA support is still pending / flaky
 - Okta ‘kinda’ works in IE mode, native not supported
 - RMUnify ‘kinda’ works in IE mode, native not supported
-- If you use redirection and restartExplorer true, make sure the OneDriveMapper runs when the user is fully logged in, restarting explorer during logon can cause hangs. Best practise: don’t enable it, the redirect will work the next logon for roaming profiles
-- The OneDriveMapper script does not work Powershell V2 or lower (comes with Windows 7), install V3 or higher
+- This script does not work Powershell V2 or lower (comes with Windows 7), install V3 or higher
 
 ## License
 - The installer is released under The MIT License (MIT) by Sulava Oy
