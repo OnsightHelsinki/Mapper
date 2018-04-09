@@ -4,7 +4,7 @@ This tool maps OneDrive for Business as network drive using WebDAV. It does this
 
 ## Steps
 1. Figure out your SharePoint Online tenant name, if your tenant URL is https://sulava.sharepoint.com, then your tenant name is "sulava"
-2. Install the tool (Requires administrator rights because it sets login.microsoftonline.com, office.com and your company domain as trusted sites to IE) and sets the tool to auto start on login as well as starts neccessary services for using WebDav
+2. Install the tool (Requires administrator rights because it sets some sites as trusted sites to IE) and sets the tool to auto start on login as well as starts neccessary services for using WebDav. See the [System changes](#system-changes) section for more infromation.
 3. Restart computer and you should see X: mapped as your One Drive for Business 
 
 ## Installing
