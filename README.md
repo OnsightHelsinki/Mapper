@@ -59,6 +59,10 @@ The installer will perform the configuration changes listed below.
  - Start the webclient service
   - This require the installer to be started using an administrator account, or an account capable of starting services
   - Command: `NET START WEBCLIENT`
+  
+### Customizations made by the mapper script
+
+Some registry keys are also added when running the mapper script for the first time. See the documentation for [OneDriveMapper.ps1](http://www.lieben.nu/liebensraum/onedrivemapper/) for more details.
  
 ## Depencies
 
