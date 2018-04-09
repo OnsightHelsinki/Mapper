@@ -10,10 +10,10 @@ This tool maps OneDrive for Business as network drive using WebDAV. It does this
 ## Installing
 
 ### Installation command
-`msiexec /i Sulava.MapperPS.Installer.msi TENANT={tenant name} DRIVE_LETTER=X USER_LOOKUP_MODE=1 /q`
+`msiexec /i Sulava.MapperPS.Installer.msi TENANT=[TENANT] DRIVE_LETTER=X USER_LOOKUP_MODE=1 /q`
 
 ### Parameters
-- *TENANT*: Name of the SharePoint Online tenant, i.e. <tenant>.sharepoint.com
+- *TENANT*: Name of the SharePoint Online tenant, i.e. [TENANT].sharepoint.com
 - *DRIVE_LETTER*: Which letter we try use for mapping. If letter is not available we try all the others.
 - *USER_LOOKUP_MODE*: Parameter for specifying how the user is fetched. Values are:
   -	1 = Active Directory UPN, 
@@ -33,12 +33,12 @@ This tool maps OneDrive for Business as network drive using WebDAV. It does this
 
 The installer will perform the configuration changes listed below.
 
-### Registry keys
+### Registry keys set by the installer
 - Add relevant sites as trusted in Internet Explorer. See [this](https://support.microsoft.com/en-us/help/182569/internet-explorer-security-zones-registry-entries-for-advanced-users) page for more details.
   - HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains
     - Name="https://[TENANT].sharepoint.com"
       - Type="integer" Name="https" Value=2 (trusted internet zone)
-    - NAme="https://[TENANT]-my.sharepoint.com"
+    - Name="https://[TENANT]-my.sharepoint.com"
       - Type="integer" Name="https" Value="2"
 - Create a task run by Windows when starting
   - HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
